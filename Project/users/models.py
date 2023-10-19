@@ -1,30 +1,42 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import  AbstractBaseUser
+from .managers import BaseUserManager, CustomUserManager
+from study.models import Subject
 
+
+class User(AbstractBaseUser):
+    full_name = models.CharField(max_length=50)
+    email = models.EmailField(unique=True)
+    is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+    profile_pic = models.CharField(max_length=50, null=True)
+    contact = models.CharField(max_length=13)
+
+    USERNAME_FIELD:str = 'email'
+    REQUIRED_FIELDS:list = ["email"]
+
+    objects = CustomUserManager()
+
+    def get_email(self):
+        return self.email
 
 class Teacher(User):
-    full_name = models.CharField(max_length=50)
-    contact = models.CharField(max_length=13)
     guardian = models.CharField(max_length=50)
     emergency_contact = models.CharField(max_length=13)
     bloodGroup = models.CharField(max_length=3)
-    profile_pic = models.CharField(max_length=50)
-    # subjects = models.ManyToMany(Subject, on_delete=CASCADE) To be added when Subject model completed.
+    subjects = models.ManyToManyField(Subject) 
 
+    class Meta:
+        verbose_name_plural = "Teacher"
 
+class Parent(User):
+
+    class Meta:
+        verbose_name_plural = "Parent"
 class Student(User):
-    full_name = models.CharField(max_length=50)
-    contact = models.CharField(max_length=13)
-    guardian = models.CharField(max_length=50)
+    guardian = models.ForeignKey(Parent, on_delete= models.CASCADE, null=True, blank=True)
     emergency_contact = models.CharField(max_length=13)
     bloodGroup = models.CharField(max_length=3)
-    profile_pic = models.CharField(max_length=50)
-    # subjects = models.ManyToMany(Subject, on_delete=CASCADE) To be added when Subject model completed.
-    # standard = models.CharField(max_length=10)
-
-
-class Parents(User):
-    full_name = models.CharField(max_length=50)
-    contact = models.CharField(max_length=13)   
-    profile_pic = models.CharField(max_length=50)
-
+    subjects = models.ManyToManyField(Subject)
+    class Meta:
+        verbose_name_plural = "Student"
