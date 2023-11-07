@@ -9,7 +9,7 @@ class Subjects(APIView):
     permission_classes = [IsTeacher,]
 
     def get(self,request):
-        subjcets = Subjects.objects.all()
+        pass    
 
     def post(self, request):
         pass
